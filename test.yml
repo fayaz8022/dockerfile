@@ -1,5 +1,5 @@
 ---
-- hosts: redhatnodes
+- hosts: redhatnode1
   user: fayaz 
   become: True
   tasks:
