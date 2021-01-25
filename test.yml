@@ -1,0 +1,14 @@
+---
+- hosts: redhatnode1
+  user: fayaz 
+  become: True
+  tasks:
+    - name: Install httpd package
+      yum:
+        name: httpd
+        state: latest
+    - name: ensure running
+      service:
+        name: httpd
+        state: started
+
