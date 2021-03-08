@@ -1,4 +1,9 @@
 # Docker
+- task: Docker@2
+  inputs:
+    repository: 'docker push sayedfayaz8022/azuredevops:tagname'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
 # Build a Docker image
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
