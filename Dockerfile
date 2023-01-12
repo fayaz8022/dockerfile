@@ -7,3 +7,4 @@ RUN tar -xvfz apache-tomcat-9.0.41.tar.gz
 RUN cp -Rv /tmp/apache-tomcat-9.0.41/* /usr/local/tomcat/
 EXPOSE 8080
 CMD /usr/local/tomcat/bin/catalina.sh run
+test
