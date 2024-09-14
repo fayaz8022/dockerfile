@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: example-namespace
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-config
+  namespace: example-namespace
+data:
+  welcome.message: "Welcome to the Kubernetes Deployment"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-secret
+  namespace: example-namespace
+type: Opaque
+data:
+  username: dXNlcg==        # Base64 encoded value for "user"
+  password: cGFzc3dvcmQ=    # Base64 encoded value for "password"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: example-pv
+  namespace: example-namespace
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-pvc
+  namespace: example-namespace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  namespace: example-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example
+  template:
+    metadata:
+      labels:
+        app: example
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: example-storage
+              mountPath: /usr/share/nginx/html
+          env:
+            - name: WELCOME_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: example-config
+                  key: welcome.message
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: example-secret
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: example-secret
+                  key: password
+      volumes:
+        - name: example-storage
+          persistentVolumeClaim:
+            claimName: example-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-service
+  namespace: example-namespace
+spec:
+  selector:
+    app: example
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
